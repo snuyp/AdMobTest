@@ -8,46 +8,57 @@ import android.support.v7.widget.RecyclerView;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.example.dima.admobtest.adapter.ListNewsAdapter;
 import com.example.dima.admobtest.adapter.ListSourceAdapter;
+import com.example.dima.admobtest.mvp.model.Article;
 import com.example.dima.admobtest.mvp.model.SourceNews;
+import com.example.dima.admobtest.mvp.presenter.ArticlePresenter;
 import com.example.dima.admobtest.mvp.presenter.SourcePresenter;
+import com.example.dima.admobtest.mvp.view.ArticleView;
 import com.example.dima.admobtest.mvp.view.SourceView;
 
 import java.util.List;
 
 import dmax.dialog.SpotsDialog;
 
-public class PreviewActivity extends MvpAppCompatActivity implements SourceView {
+public class ContentActivity extends MvpAppCompatActivity implements ArticleView{
     @InjectPresenter
-    SourcePresenter sourcePresenter;
+    ArticlePresenter articlePresenter;
 
     SwipeRefreshLayout swipeRefreshLayout;
 
-    private RecyclerView listWebsite;
+    private ListNewsAdapter adapter;
+    private RecyclerView lstNews;
     private RecyclerView.LayoutManager layoutManager;
-    private ListSourceAdapter adapter;
-
-
     private SpotsDialog dialog;
 
+    private String source = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_preview);
-        listWebsite = findViewById(R.id.list_source);
-        listWebsite.setHasFixedSize(true);
-        layoutManager = new LinearLayoutManager(this);
-        listWebsite.setLayoutManager(layoutManager);
-
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh);
+        setContentView(R.layout.activity_content);
+        dialog = new SpotsDialog(this);
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_news);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                sourcePresenter.loadSources(true);
+                articlePresenter.loadNews(source,true);
             }
         });
-        dialog = new SpotsDialog(this);
-        sourcePresenter.loadSources(true);
+        if(getIntent() != null)
+        {
+            source = getIntent().getStringExtra("source");
+            if(!source.isEmpty())
+            {
+                articlePresenter.loadNews(source,false);
+            }
+        }
+
+        lstNews = findViewById(R.id.lst_news);
+        lstNews.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this);
+        lstNews.setLayoutManager(layoutManager);
+
     }
 
     @Override
@@ -66,8 +77,8 @@ public class PreviewActivity extends MvpAppCompatActivity implements SourceView 
     }
 
     @Override
-    public void onLoadResult(List<SourceNews> sources) {
-        adapter = new ListSourceAdapter(this, sources);
-        listWebsite.setAdapter(adapter);
+    public void onLoadResult(List<Article> articles) {
+        adapter = new ListNewsAdapter(articles,this);
+        lstNews.setAdapter(adapter);
     }
 }
