@@ -12,6 +12,9 @@ import com.example.dima.admobtest.adapter.ListSourceAdapter;
 import com.example.dima.admobtest.mvp.model.SourceNews;
 import com.example.dima.admobtest.mvp.presenter.SourcePresenter;
 import com.example.dima.admobtest.mvp.view.SourceView;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 
 import java.util.List;
 
@@ -26,14 +29,24 @@ public class PreviewActivity extends MvpAppCompatActivity implements SourceView 
     private RecyclerView listWebsite;
     private RecyclerView.LayoutManager layoutManager;
     private ListSourceAdapter adapter;
-
-
     private SpotsDialog dialog;
-
+    private AdView mAdView;
+    private String language;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview);
+
+        language = getIntent().getStringExtra("language");
+
+        AdView adView = new AdView(this);
+        adView.setAdSize(AdSize.BANNER);
+        adView.setAdUnitId("ca-app-pub-4362588175476230/2982507325");
+       // adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
         listWebsite = findViewById(R.id.list_source);
         listWebsite.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -43,11 +56,12 @@ public class PreviewActivity extends MvpAppCompatActivity implements SourceView 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                sourcePresenter.loadSources(true);
+                sourcePresenter.loadSources(true,language);
             }
         });
         dialog = new SpotsDialog(this);
-        sourcePresenter.loadSources(true);
+        sourcePresenter.loadSources(true,language);
+
     }
 
     @Override

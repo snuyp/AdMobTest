@@ -18,8 +18,8 @@ import retrofit2.Response;
 public class SourcePresenter extends MvpPresenter<SourceView> {
     private NewsService newsService = Common.getNewsService();
 
-    public void loadSources(boolean isRefreshed) {
-        String languageSource = "ru";
+    public void loadSources(boolean isRefreshed,String language) {
+        String languageSource = language;
         if (!isRefreshed) {
                 getViewState().dialogShow();
                 newsService.getSources(languageSource, Common.API_KEY).enqueue(new Callback<WebSite>() {

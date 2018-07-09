@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
@@ -16,6 +17,10 @@ import com.example.dima.admobtest.mvp.presenter.ArticlePresenter;
 import com.example.dima.admobtest.mvp.presenter.SourcePresenter;
 import com.example.dima.admobtest.mvp.view.ArticleView;
 import com.example.dima.admobtest.mvp.view.SourceView;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 
 import java.util.List;
 
@@ -33,6 +38,7 @@ public class ContentActivity extends MvpAppCompatActivity implements ArticleView
     private SpotsDialog dialog;
 
     private String source = "";
+    private InterstitialAd mInterstitialAd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,12 +59,34 @@ public class ContentActivity extends MvpAppCompatActivity implements ArticleView
                 articlePresenter.loadNews(source,false);
             }
         }
-
         lstNews = findViewById(R.id.lst_news);
         lstNews.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         lstNews.setLayoutManager(layoutManager);
 
+        mInterstitialAd = new InterstitialAd(this);
+        //for example
+       // mInterstitialAd.setAdUnitId("ca-app-pub-4362588175476230/1808084502");
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+
+        AdView adView = new AdView(this);
+        adView.setAdSize(AdSize.BANNER);
+        adView.setAdUnitId("ca-app-pub-4362588175476230/2982507325");
+        // adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+        AdView mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mInterstitialAd != null && mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            Toast.makeText(this, "Ad did not load", Toast.LENGTH_SHORT).show();
+        }
+        super.onBackPressed();
     }
 
     @Override
